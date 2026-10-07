@@ -1,0 +1,103 @@
+/* Custom Bookstore Theme & Helper Styles */
+:root {
+  --bs-primary: #0f766e;
+  --bs-primary-rgb: 15, 118, 110;
+  --bs-link-color: #0f766e;
+  --bs-link-hover-color: #115e59;
+  --primary-color: #0f766e;
+  --primary-hover: #115e59;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Primary color override for buttons, links, and borders */
+.btn-primary {
+  background-color: #0f766e !important;
+  border-color: #0f766e !important;
+  color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #115e59 !important;
+  border-color: #115e59 !important;
+  color: #ffffff !important;
+}
+
+.btn-outline-primary {
+  color: #0f766e !important;
+  border-color: #0f766e !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: #0f766e !important;
+  border-color: #0f766e !important;
+  color: #ffffff !important;
+}
+
+.text-primary {
+  color: #0f766e !important;
+}
+
+.border-primary {
+  border-color: #0f766e !important;
+}
+
+/* Card hover animation */
+.book-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.book-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.12) !important;
+}
+
+/* Team card social links */
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  color: #64748b;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.social-icon:hover {
+  background-color: #0f766e;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Active Nav link styling */
+.nav-link.text-primary {
+  color: #0f766e !important;
+}
