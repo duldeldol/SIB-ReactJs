@@ -14,7 +14,7 @@ function Footer() {
           {/* Kolom 1: Brand & Info */}
           <div className="col-lg-4 col-md-6">
             <div className="d-flex align-items-center mb-3">
-              <i className="fa-solid fa-book-open text-primary fs-3 me-2"></i>
+              <i className="fa-solid fa-book text-primary fs-3 me-2"></i>
               <span className="fs-4 fw-bold text-white">
                 Book<span className="text-primary">Store</span>
               </span>
@@ -40,7 +40,7 @@ function Footer() {
                   to="/"
                   className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Beranda
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Home
                 </Link>
               </li>
               <li>
@@ -48,7 +48,7 @@ function Footer() {
                   to="/team"
                   className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Tim Kami
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Team
                 </Link>
               </li>
               <li>
@@ -56,7 +56,7 @@ function Footer() {
                   to="/contact"
                   className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Kontak
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Contact
                 </Link>
               </li>
             </ul>

@@ -2,8 +2,9 @@ import React from 'react';
 
 function Hero({ onExploreClick }) {
   return (
-    <section className="container col-xxl-10 px-4 py-5">
-      <div className="row flex-lg-row-reverse align-items-center g-5 py-3">
+    <section className="py-5 bg-white" id="hero-section">
+      <div className="container col-xxl-10 px-4">
+        <div className="row flex-lg-row-reverse align-items-center g-5">
         {/* Hero Image */}
         <div className="col-10 col-sm-8 col-lg-6 mx-auto text-center">
           <div className="position-relative d-inline-block shadow-lg rounded-4 overflow-hidden border border-2 border-white">
@@ -63,7 +64,8 @@ function Hero({ onExploreClick }) {
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
   );
 }
 
