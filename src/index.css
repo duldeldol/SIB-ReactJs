@@ -6,6 +6,7 @@
   --bs-link-hover-color: #115e59;
   --primary-color: #0f766e;
   --primary-hover: #115e59;
+  --primary-light: rgba(15, 118, 110, 0.08);
 }
 
 * {
@@ -30,11 +31,114 @@ main {
   flex: 1 0 auto;
 }
 
-/* Primary color override for buttons, links, and borders */
+/* =========================================================
+   CUSTOM NAVBAR & ENHANCED NAVIGATION STYLING (BONUS POINTS)
+   ========================================================= */
+.custom-navbar {
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.brand-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: rgba(15, 118, 110, 0.08);
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.navbar-brand:hover .brand-icon-wrapper {
+  transform: scale(1.08) rotate(-4deg);
+  background-color: rgba(15, 118, 110, 0.15);
+}
+
+/* NavLink Custom Items */
+.nav-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.15rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 50rem;
+  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.nav-link-item .nav-icon {
+  font-size: 0.9rem;
+  transition: transform 0.25s ease;
+}
+
+/* Hover State */
+.nav-link-item:hover {
+  color: #0f766e;
+  background-color: rgba(15, 118, 110, 0.08);
+  transform: translateY(-2px);
+}
+
+.nav-link-item:hover .nav-icon {
+  transform: scale(1.15);
+}
+
+/* Active State (React Router NavLink active class) */
+.nav-link-item.active {
+  color: #ffffff !important;
+  background-color: #0f766e !important;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.28);
+  transform: translateY(-1px);
+}
+
+.nav-link-item.active .nav-icon {
+  color: #ffffff;
+}
+
+/* Mobile NavLink items */
+.nav-link-item.mobile {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+}
+
+.nav-link-item.mobile.active {
+  background-color: #0f766e;
+  color: #ffffff !important;
+}
+
+/* Mobile menu container animation */
+.animate-fadeIn {
+  animation: fadeInNav 0.25s ease-out forwards;
+}
+
+@keyframes fadeInNav {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   BUTTONS, CARDS, & THEME OVERRIDES
+   ========================================================= */
 .btn-primary {
   background-color: #0f766e !important;
   border-color: #0f766e !important;
   color: #ffffff !important;
+  transition: all 0.25s ease;
 }
 
 .btn-primary:hover,
@@ -43,11 +147,13 @@ main {
   background-color: #115e59 !important;
   border-color: #115e59 !important;
   color: #ffffff !important;
+  transform: translateY(-1px);
 }
 
 .btn-outline-primary {
   color: #0f766e !important;
   border-color: #0f766e !important;
+  transition: all 0.25s ease;
 }
 
 .btn-outline-primary:hover,
@@ -56,6 +162,7 @@ main {
   background-color: #0f766e !important;
   border-color: #0f766e !important;
   color: #ffffff !important;
+  transform: translateY(-1px);
 }
 
 .text-primary {
@@ -97,7 +204,22 @@ main {
   transform: translateY(-2px);
 }
 
-/* Active Nav link styling */
-.nav-link.text-primary {
+/* Footer Links & Hover Effect */
+.footer-link {
+  transition: all 0.2s ease;
+}
+
+.footer-link:hover {
   color: #0f766e !important;
+  transform: translateX(4px);
+}
+
+.social-hover {
+  transition: all 0.25s ease;
+}
+
+.social-hover:hover {
+  background-color: #0f766e !important;
+  border-color: #0f766e !important;
+  transform: translateY(-3px);
 }

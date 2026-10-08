@@ -1,14 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router';
 
-function Footer({ setActivePage }) {
+/**
+ * Footer - Komponen Footer Aplikasi BookStore
+ * Menggunakan Link dari React Router untuk navigasi cepat antar rute
+ * serta menyajikan informasi toko dan identitas pengembang.
+ */
+function Footer() {
   return (
-    <footer className="bg-dark text-white pt-5 pb-4 mt-auto">
+    <footer className="bg-dark text-white pt-5 pb-4 mt-auto border-top border-secondary border-opacity-25">
       <div className="container">
         <div className="row g-4 justify-content-between">
           {/* Kolom 1: Brand & Info */}
           <div className="col-lg-4 col-md-6">
             <div className="d-flex align-items-center mb-3">
-              <i className="fa-solid fa-book text-primary fs-3 me-2"></i>
+              <i className="fa-solid fa-book-open text-primary fs-3 me-2"></i>
               <span className="fs-4 fw-bold text-white">
                 Book<span className="text-primary">Store</span>
               </span>
@@ -23,47 +29,35 @@ function Footer({ setActivePage }) {
             </div>
           </div>
 
-          {/* Kolom 2: Navigasi Cepat */}
+          {/* Kolom 2: Navigasi Cepat (React Router Links) */}
           <div className="col-lg-2 col-md-3 col-6">
             <h6 className="fw-bold text-white text-uppercase mb-3 small tracking-wider">
               Navigasi
             </h6>
             <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
               <li>
-                <button
-                  type="button"
-                  className="btn btn-link text-secondary text-decoration-none p-0 small text-start"
-                  onClick={() => {
-                    setActivePage('home');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                <Link
+                  to="/"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Home
-                </button>
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Beranda
+                </Link>
               </li>
               <li>
-                <button
-                  type="button"
-                  className="btn btn-link text-secondary text-decoration-none p-0 small text-start"
-                  onClick={() => {
-                    setActivePage('team');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                <Link
+                  to="/team"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Team
-                </button>
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Tim Kami
+                </Link>
               </li>
               <li>
-                <button
-                  type="button"
-                  className="btn btn-link text-secondary text-decoration-none p-0 small text-start"
-                  onClick={() => {
-                    setActivePage('contact');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                <Link
+                  to="/contact"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Contact
-                </button>
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Kontak
+                </Link>
               </li>
             </ul>
           </div>
@@ -91,10 +85,10 @@ function Footer({ setActivePage }) {
             </p>
             <div className="d-flex gap-2 mb-3">
               <a
-                href="https://github.com"
+                href="https://github.com/duldeldol/SIB-ReactJs"
                 target="_blank"
                 rel="noreferrer"
-                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center social-hover"
                 style={{ width: '36px', height: '36px' }}
                 title="GitHub"
               >
@@ -104,7 +98,7 @@ function Footer({ setActivePage }) {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noreferrer"
-                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center social-hover"
                 style={{ width: '36px', height: '36px' }}
                 title="LinkedIn"
               >
@@ -114,7 +108,7 @@ function Footer({ setActivePage }) {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
-                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                className="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center social-hover"
                 style={{ width: '36px', height: '36px' }}
                 title="Instagram"
               >
@@ -125,7 +119,7 @@ function Footer({ setActivePage }) {
         </div>
 
         {/* Divider & Copyright */}
-        <div className="border-top border-secondary pt-4 mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+        <div className="border-top border-secondary border-opacity-25 pt-4 mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
           <p className="text-secondary small mb-0">
             © 2026 <strong>BookStore</strong> • Dikembangkan oleh <strong>Haydar Ali Ayyubi</strong>
           </p>
