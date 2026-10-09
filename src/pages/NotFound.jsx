@@ -1,10 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-/**
- * NotFound - Kategori Elemen Halaman (Page Element)
- * Ditampilkan saat URL yang diakses pengguna tidak cocok dengan rute mana pun (*).
- */
 function NotFound() {
   return (
     <div className="py-5 my-auto text-center">

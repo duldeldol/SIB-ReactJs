@@ -1,9 +1,3 @@
-/**
- * books.js - Sumber Data Buku Utama (Utils)
- * Berisi kumpulan data buku (minimal 9 data) sesuai instruksi tugas.
- * Struktur data memenuhi properti wajib: id, title, author, year, description, image,
- * serta dilengkapi atribut pendukung untuk kompatibilitas tampilan katalog.
- */
 const books = [
   {
     id: 1,

@@ -4,11 +4,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ScrollToTop from '../components/ScrollToTop';
 
-/**
- * MainLayout - Kategori Elemen Layout (Layout Route)
- * Membungkus seluruh halaman utama aplikasi dengan Navbar dan Footer konsisten,
- * serta merender komponen halaman anak melalui <Outlet />.
- */
 function MainLayout() {
   return (
     <div className="d-flex flex-column min-vh-100 app-wrapper">
