@@ -8,16 +8,19 @@ function ProductList() {
   // Ambil kategori unik secara dinamis dari data buku
   const categories = ['Semua', ...Array.from(new Set(booksData.map((b) => b.category).filter(Boolean)))];
 
-  const filteredBooks = selectedCategory === 'Semua' 
-    ? booksData 
-    : booksData.filter(b => b.category === selectedCategory);
+  // Di Home dibatasi maksimal 6 buku agar rapi dan tidak spam
+  const filteredBooks = (
+    selectedCategory === 'Semua' 
+      ? booksData 
+      : booksData.filter((b) => b.category === selectedCategory)
+  ).slice(0, 6);
 
   return (
     <div className="album py-5 bg-light" id="product-list">
       <div className="container">
         {/* Section Header */}
         <div className="text-center mb-5">
-          <h2 className="display-6 fw-bold text-dark">Katalog Buku Pilihan</h2>
+          <h2 className="display-6 fw-bold text-dark">Katalog Buku Best Seller</h2>
           <p className="lead text-secondary mx-auto" style={{ maxWidth: '650px' }}>
             Temukan buku-buku pilihan kurator terbaik dengan ulasan tertinggi untuk memperkaya wawasan dan inspirasi hidupmu.
           </p>
