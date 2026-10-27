@@ -124,6 +124,30 @@ const books = [
     price: 145000,
     rating: 4.9,
     reviews: 9700
+  },
+  {
+    id: 11,
+    title: "The Pragmatic Programmer",
+    author: "David Thomas & Andrew Hunt",
+    year: 2019,
+    description: "Wawasan berharga dan filosofi pengembangan software profesional dari pengkodean hingga arsitektur sistem modern.",
+    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80",
+    category: "Teknologi & Pemrograman",
+    price: 155000,
+    rating: 4.9,
+    reviews: 8800
+  },
+  {
+    id: 12,
+    title: "Sapiens: Riwayat Singkat Umat Manusia",
+    author: "Yuval Noah Harari",
+    year: 2014,
+    description: "Penjelajahan mendalam perjalanan evolusi biologis dan peradaban umat manusia dari zaman batu hingga abad modern.",
+    image: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80",
+    category: "Fiksi & Sejarah",
+    price: 125000,
+    rating: 4.8,
+    reviews: 14200
   }
 ];
 

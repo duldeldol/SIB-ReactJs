@@ -45,6 +45,14 @@ function Footer() {
               </li>
               <li>
                 <Link
+                  to="/books"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
+                >
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Books
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/team"
                   className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
                 >
@@ -62,16 +70,52 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Kolom 3: Kategori Buku */}
+          {/* Kolom 3: Kategori Populer (Tautan Interaktif ke /books) */}
           <div className="col-lg-3 col-md-3 col-6">
             <h6 className="fw-bold text-white text-uppercase mb-3 small tracking-wider">
-              Kategori Buku
+              Kategori Populer
             </h6>
-            <ul className="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
-              <li>Self Improvement</li>
-              <li>Fiksi & Sastra</li>
-              <li>Finansial & Bisnis</li>
-              <li>Sains & Teknologi</li>
+            <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+              <li>
+                <Link
+                  to="/books"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
+                >
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Teknologi & Pemrograman
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/books"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
+                >
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Self Improvement & Filsafat
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/books"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
+                >
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Fiksi & Sejarah
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/books"
+                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
+                >
+                  <i className="fa-solid fa-angle-right me-1 small"></i> Finansial & Bisnis
+                </Link>
+              </li>
+              <li className="pt-1">
+                <Link
+                  to="/books"
+                  className="text-primary text-decoration-none small fw-semibold d-inline-flex align-items-center footer-cta-link"
+                >
+                  Lihat Semua Kategori <i className="fa-solid fa-arrow-right ms-1 small"></i>
+                </Link>
+              </li>
             </ul>
           </div>
 
