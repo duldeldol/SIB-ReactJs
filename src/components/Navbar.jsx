@@ -3,8 +3,8 @@ import { Link, NavLink } from 'react-router';
 
 /**
  * Navbar - Komponen Navigasi Utama Aplikasi BookStore
- * Menerapkan NavLink dari React Router dengan styling aktif interaktif
- * serta menu responsif (mobile drawer toggle).
+ * Menggunakan NavLink dari React Router dengan styling aktif interaktif
+ * serta menu responsif untuk perangkat mobile.
  */
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,16 +21,14 @@ function Navbar() {
     <header className="custom-navbar sticky-top border-bottom">
       <div className="container py-2">
         <div className="d-flex align-items-center justify-content-between">
-          {/* Logo & Brand Name */}
+          {/* Logo & Brand Name (Format Asli) */}
           <Link
             to="/"
             onClick={closeNav}
-            className="navbar-brand d-flex align-items-center text-decoration-none"
+            className="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"
           >
-            <div className="brand-icon-wrapper me-2">
-              <i className="fa-solid fa-book-open text-primary fs-3"></i>
-            </div>
-            <span className="fs-4 fw-bold text-dark tracking-tight">
+            <i className="fa-solid fa-book text-primary fs-3 me-2"></i>
+            <span className="fs-4 fw-bold text-dark">
               Book<span className="text-primary">Store</span>
             </span>
           </Link>
@@ -56,7 +54,7 @@ function Navbar() {
               }
             >
               <i className="fa-solid fa-house nav-icon"></i>
-              <span>Beranda</span>
+              <span>Home</span>
             </NavLink>
 
             <NavLink
@@ -66,7 +64,7 @@ function Navbar() {
               }
             >
               <i className="fa-solid fa-users nav-icon"></i>
-              <span>Tim Kami</span>
+              <span>Team</span>
             </NavLink>
 
             <NavLink
@@ -76,25 +74,25 @@ function Navbar() {
               }
             >
               <i className="fa-solid fa-envelope nav-icon"></i>
-              <span>Kontak</span>
+              <span>Contact</span>
             </NavLink>
           </nav>
 
-          {/* Action Buttons (Desktop) */}
+          {/* Desktop Auth Action Buttons */}
           <div className="d-none d-lg-flex align-items-center gap-2">
             <button
               type="button"
-              className="btn btn-sm btn-outline-primary px-3 py-2 rounded-pill fw-semibold shadow-2xs"
+              className="btn btn-outline-primary me-2 px-3 py-2 rounded-pill fw-semibold"
               onClick={() => alert('Fitur Login akan segera hadir!')}
             >
-              <i className="fa-solid fa-right-to-bracket me-1"></i> Masuk
+              <i className="fa-solid fa-right-to-bracket me-1"></i> Login
             </button>
             <button
               type="button"
-              className="btn btn-sm btn-primary px-3 py-2 rounded-pill fw-semibold shadow-sm"
+              className="btn btn-primary px-3 py-2 rounded-pill fw-semibold shadow-sm"
               onClick={() => alert('Fitur Register akan segera hadir!')}
             >
-              <i className="fa-solid fa-user-plus me-1"></i> Daftar
+              <i className="fa-solid fa-user-plus me-1"></i> Register
             </button>
           </div>
         </div>
@@ -112,7 +110,7 @@ function Navbar() {
                 }
               >
                 <i className="fa-solid fa-house nav-icon"></i>
-                <span>Beranda</span>
+                <span>Home</span>
               </NavLink>
 
               <NavLink
@@ -123,7 +121,7 @@ function Navbar() {
                 }
               >
                 <i className="fa-solid fa-users nav-icon"></i>
-                <span>Tim Kami</span>
+                <span>Team</span>
               </NavLink>
 
               <NavLink
@@ -134,7 +132,7 @@ function Navbar() {
                 }
               >
                 <i className="fa-solid fa-envelope nav-icon"></i>
-                <span>Kontak</span>
+                <span>Contact</span>
               </NavLink>
             </div>
 
@@ -147,7 +145,7 @@ function Navbar() {
                   alert('Fitur Login akan segera hadir!');
                 }}
               >
-                <i className="fa-solid fa-right-to-bracket me-1"></i> Masuk
+                <i className="fa-solid fa-right-to-bracket me-1"></i> Login
               </button>
               <button
                 type="button"
@@ -157,7 +155,7 @@ function Navbar() {
                   alert('Fitur Register akan segera hadir!');
                 }}
               >
-                <i className="fa-solid fa-user-plus me-1"></i> Daftar
+                <i className="fa-solid fa-user-plus me-1"></i> Register
               </button>
             </div>
           </div>
