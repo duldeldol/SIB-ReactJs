@@ -135,20 +135,35 @@ function Book() {
           </div>
         </div>
 
-        {/* Notifikasi Alert Interaktif */}
+        {/* Floating Toast Notification Pop-up (Pojok Kanan Atas) */}
         {notification && (
           <div
-            className={`alert alert-${notification.type} alert-dismissible fade show rounded-4 shadow-sm mb-4 d-flex align-items-center gap-2`}
-            role="alert"
+            className="position-fixed top-0 end-0 p-3"
+            style={{ zIndex: 1080, marginTop: '80px' }}
           >
-            <i className={`fa-solid ${notification.type === 'success' ? 'fa-circle-check' : 'fa-circle-info'} fs-5`}></i>
-            <span className="fw-medium">{notification.message}</span>
-            <button
-              type="button"
-              className="btn-close ms-auto"
-              aria-label="Close"
-              onClick={() => setNotification(null)}
-            ></button>
+            <div
+              className="toast show align-items-center bg-white border border-success border-opacity-25 shadow-lg rounded-4 p-2 animate-fadeIn"
+              role="alert"
+              style={{ maxWidth: '380px' }}
+            >
+              <div className="d-flex p-2 align-items-center">
+                <div className={`me-3 fs-3 ${notification.type === 'success' ? 'text-success' : 'text-primary'}`}>
+                  <i className={`fa-solid ${notification.type === 'success' ? 'fa-circle-check' : 'fa-circle-info'}`}></i>
+                </div>
+                <div className="toast-body p-0 flex-grow-1">
+                  <div className="fw-bold text-dark small">
+                    {notification.type === 'success' ? 'Berhasil Menambahkan!' : 'Informasi'}
+                  </div>
+                  <div className="text-secondary small">{notification.message}</div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close ms-2"
+                  aria-label="Close"
+                  onClick={() => setNotification(null)}
+                ></button>
+              </div>
+            </div>
           </div>
         )}
 

@@ -100,20 +100,13 @@ function Footer() {
                   <i className="fa-solid fa-angle-right me-1 small"></i> Fiksi & Sejarah
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/books"
-                  className="text-secondary text-decoration-none small footer-link d-inline-flex align-items-center"
-                >
-                  <i className="fa-solid fa-angle-right me-1 small"></i> Finansial & Bisnis
-                </Link>
-              </li>
               <li className="pt-1">
                 <Link
                   to="/books"
-                  className="text-primary text-decoration-none small fw-semibold d-inline-flex align-items-center footer-cta-link"
+                  className="text-primary text-decoration-none small fw-semibold d-inline-flex align-items-center gap-2 footer-cta-link"
                 >
-                  Lihat Semua Kategori <i className="fa-solid fa-arrow-right ms-1 small"></i>
+                  <span>Lihat Semua Kategori</span>
+                  <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }}></i>
                 </Link>
               </li>
             </ul>

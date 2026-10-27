@@ -223,3 +223,12 @@ main {
   border-color: #0f766e !important;
   transform: translateY(-3px);
 }
+
+.footer-cta-link {
+  transition: all 0.2s ease;
+}
+
+.footer-cta-link:hover {
+  color: #0f766e !important;
+  transform: translateX(3px);
+}
