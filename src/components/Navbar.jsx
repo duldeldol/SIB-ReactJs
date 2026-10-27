@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router';
 
-/**
- * Navbar - Komponen Navigasi Utama Aplikasi BookStore
- * Menggunakan NavLink dari React Router dengan styling aktif interaktif
- * serta menu responsif untuk perangkat mobile.
- */
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 

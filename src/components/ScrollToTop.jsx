@@ -1,10 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
-/**
- * Utilitas router untuk mereset posisi scroll ke bagian atas layar
- * setiap kali pengguna berpindah rute URL, atau scroll ke ID jika terdapat hash.
- */
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
 

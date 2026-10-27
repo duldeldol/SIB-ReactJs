@@ -1,11 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-/**
- * Footer - Komponen Footer Aplikasi BookStore
- * Menggunakan Link dari React Router untuk navigasi cepat antar rute
- * serta menyajikan informasi toko dan identitas pengembang.
- */
 function Footer() {
   return (
     <footer className="bg-dark text-white pt-5 pb-4 mt-auto border-top border-secondary border-opacity-25">
@@ -106,7 +101,10 @@ function Footer() {
                   className="text-primary text-decoration-none small fw-semibold d-inline-flex align-items-center gap-2 footer-cta-link"
                 >
                   <span>Lihat Semua Kategori</span>
-                  <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }}></i>
+                  <i
+                    className="fa-solid fa-arrow-right"
+                    style={{ fontSize: '0.75rem', transform: 'translateY(2px)', display: 'inline-block' }}
+                  ></i>
                 </Link>
               </li>
             </ul>
