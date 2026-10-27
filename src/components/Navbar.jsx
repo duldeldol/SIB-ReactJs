@@ -58,6 +58,16 @@ function Navbar() {
             </NavLink>
 
             <NavLink
+              to="/books"
+              className={({ isActive }) =>
+                `nav-link-item ${isActive ? 'active' : ''}`
+              }
+            >
+              <i className="fa-solid fa-book-open nav-icon"></i>
+              <span>Books</span>
+            </NavLink>
+
+            <NavLink
               to="/team"
               className={({ isActive }) =>
                 `nav-link-item ${isActive ? 'active' : ''}`
@@ -111,6 +121,17 @@ function Navbar() {
               >
                 <i className="fa-solid fa-house nav-icon"></i>
                 <span>Home</span>
+              </NavLink>
+
+              <NavLink
+                to="/books"
+                onClick={closeNav}
+                className={({ isActive }) =>
+                  `nav-link-item mobile ${isActive ? 'active' : ''}`
+                }
+              >
+                <i className="fa-solid fa-book-open nav-icon"></i>
+                <span>Books</span>
               </NavLink>
 
               <NavLink

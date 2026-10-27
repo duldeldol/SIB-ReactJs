@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
+import Book from './pages/Book';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
@@ -20,6 +21,10 @@ function App() {
         <Route element={<MainLayout />}>
           {/* Halaman Index / Utama */}
           <Route index element={<Home />} />
+
+          {/* Halaman Katalog Buku (Mendukung path 'books' dan 'book') */}
+          <Route path="books" element={<Book />} />
+          <Route path="book" element={<Book />} />
 
           {/* Halaman Profil Tim */}
           <Route path="team" element={<Team />} />
