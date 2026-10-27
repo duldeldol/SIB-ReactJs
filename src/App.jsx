@@ -1,59 +1,37 @@
-import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import ProductList from './components/ProductList';
-import Team from './components/Team';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router';
+import MainLayout from './layouts/MainLayout';
+import Home from './pages/Home';
+import Team from './pages/Team';
+import Contact from './pages/Contact';
+import NotFound from './pages/NotFound';
 
+/**
+ * App - Konfigurasi Utama Declarative Routing
+ * Sesuai panduan resmi React Router (https://reactrouter.com/start/declarative/routing):
+ * Menggunakan Layout Route (<Route element={<MainLayout />}>) untuk membungkus
+ * seluruh rute ke dalam kategori elemennya masing-masing secara rapi dan modular.
+ */
 function App() {
-  const getInitialPage = () => {
-    const hash = window.location.hash.replace('#', '').toLowerCase();
-    if (['home', 'team', 'contact'].includes(hash)) return hash;
-    const params = new URLSearchParams(window.location.search);
-    const pageParam = params.get('page');
-    if (pageParam && ['home', 'team', 'contact'].includes(pageParam.toLowerCase())) {
-      return pageParam.toLowerCase();
-    }
-    return 'home';
-  };
-
-  const [activePage, setActivePage] = useState(getInitialPage);
-
-  const handlePageChange = (page) => {
-    setActivePage(page);
-    window.location.hash = page;
-  };
-
-  const scrollToProducts = () => {
-    const el = document.getElementById('product-list');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <div className="d-flex flex-column min-vh-100">
-      {/* Navbar Section */}
-      <Navbar activePage={activePage} setActivePage={handlePageChange} />
+    <BrowserRouter>
+      <Routes>
+        {/* Kategori Layout Route (Membungkus Shell Navbar & Footer) */}
+        <Route element={<MainLayout />}>
+          {/* Halaman Index / Utama */}
+          <Route index element={<Home />} />
 
-      {/* Main Content Area based on active navigation */}
-      <main className="flex-grow-1">
-        {activePage === 'home' && (
-          <>
-            <Hero onExploreClick={scrollToProducts} />
-            <ProductList />
-          </>
-        )}
+          {/* Halaman Profil Tim */}
+          <Route path="team" element={<Team />} />
 
-        {activePage === 'team' && <Team />}
+          {/* Halaman Kontak & Bantuan */}
+          <Route path="contact" element={<Contact />} />
 
-        {activePage === 'contact' && <Contact />}
-      </main>
-
-      {/* Footer Section */}
-      <Footer setActivePage={handlePageChange} />
-    </div>
+          {/* Rute Catch-all Fallback (404 Not Found) */}
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
