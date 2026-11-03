@@ -1,23 +1,27 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import MainLayout from './layouts/MainLayout';
+import AdminLayout from './layouts/AdminLayout';
 import Home from './pages/Home';
 import Book from './pages/Book';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
+import Dashboard from './pages/admin/Dashboard';
+import Genres from './pages/admin/Genres';
+import Authors from './pages/admin/Authors';
 
 /**
  * App - Konfigurasi Utama Declarative Routing
- * Sesuai panduan resmi React Router (https://reactrouter.com/start/declarative/routing):
- * Menggunakan Layout Route (<Route element={<MainLayout />}>) untuk membungkus
- * seluruh rute ke dalam kategori elemennya masing-masing secara rapi dan modular.
+ * Mendukung:
+ * 1. MainLayout (Area Publik Pengunjung Toko: Home, Books, Team, Contact)
+ * 2. AdminLayout (Area Panel Pengelola: Dashboard, Genres Read/Create, Authors Read/Create)
  */
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Kategori Layout Route (Membungkus Shell Navbar & Footer) */}
+        {/* Kategori Layout Publik (Navbar & Footer Toko) */}
         <Route element={<MainLayout />}>
           {/* Halaman Index / Utama */}
           <Route index element={<Home />} />
@@ -31,10 +35,17 @@ function App() {
 
           {/* Halaman Kontak & Bantuan */}
           <Route path="contact" element={<Contact />} />
-
-          {/* Rute Catch-all Fallback (404 Not Found) */}
-          <Route path="*" element={<NotFound />} />
         </Route>
+
+        {/* Kategori Layout Admin (Admin Sidebar & Topbar - Tugas 4) */}
+        <Route path="admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="genres" element={<Genres />} />
+          <Route path="authors" element={<Authors />} />
+        </Route>
+
+        {/* Rute Catch-all Fallback (404 Not Found) */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchGenres } from '../services/api';
 import initialBooks from '../Utils/books';
 import AddBookModal from '../components/AddBookModal';
 
@@ -18,11 +19,37 @@ function Book() {
   // Hook State untuk notifikasi feedback penambahan data
   const [notification, setNotification] = useState(null);
 
-  // Daftar kategori unik diambil secara dinamis dari daftar buku saat ini
-  const categories = [
-    'Semua',
-    ...Array.from(new Set(booksList.map((b) => b.category).filter(Boolean)))
-  ];
+  // State kategori dari master data Genre Admin (Axios)
+  const [adminCategoryNames, setAdminCategoryNames] = useState([]);
+
+  // Sinkronisasi kategori dari Admin Panel via Axios
+  useEffect(() => {
+    let isMounted = true;
+    const loadAdminGenres = async () => {
+      try {
+        const data = await fetchGenres();
+        if (isMounted && Array.isArray(data)) {
+          setAdminCategoryNames(data.map((g) => g.name).filter(Boolean));
+        }
+      } catch (err) {
+        console.error('Gagal memuat genre admin untuk katalog buku:', err);
+      }
+    };
+    loadAdminGenres();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Gabungkan kategori admin dan kategori buku saat ini
+  const allCategoryNames = Array.from(
+    new Set([
+      ...adminCategoryNames,
+      ...booksList.map((b) => b.category).filter(Boolean)
+    ])
+  );
+
+  const categories = ['Semua', ...allCategoryNames];
 
   // Handler penambahan buku baru (Fitur Nilai Tambah Hooks)
   const handleAddBook = (newBook) => {

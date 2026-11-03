@@ -83,8 +83,16 @@ function Navbar() {
             </NavLink>
           </nav>
 
-          {/* Desktop Auth Action Buttons */}
+          {/* Desktop Auth Action Buttons & Admin Shortcut */}
           <div className="d-none d-lg-flex align-items-center gap-2">
+            <Link
+              to="/admin"
+              className="btn btn-outline-dark me-1 px-3 py-2 rounded-pill fw-semibold small shadow-sm d-inline-flex align-items-center gap-2"
+              title="Masuk ke Panel Admin (Tugas 4)"
+            >
+              <i className="fa-solid fa-book-bookmark text-primary"></i>
+              <span>Admin Panel</span>
+            </Link>
             <button
               type="button"
               className="btn btn-outline-primary me-2 px-3 py-2 rounded-pill fw-semibold"
@@ -149,6 +157,17 @@ function Navbar() {
               >
                 <i className="fa-solid fa-envelope nav-icon"></i>
                 <span>Contact</span>
+              </NavLink>
+
+              <NavLink
+                to="/admin"
+                onClick={closeNav}
+                className={({ isActive }) =>
+                  `nav-link-item mobile ${isActive ? 'active' : ''}`
+                }
+              >
+                <i className="fa-solid fa-book-bookmark nav-icon text-primary"></i>
+                <span>Admin Panel</span>
               </NavLink>
             </div>
 

@@ -1,4 +1,3 @@
-/* Custom Bookstore Theme & Helper Styles */
 :root {
   --bs-primary: #0f766e;
   --bs-primary-rgb: 15, 118, 110;
@@ -31,9 +30,6 @@ main {
   flex: 1 0 auto;
 }
 
-/* =========================================================
-   CUSTOM NAVBAR & ENHANCED NAVIGATION STYLING (BONUS POINTS)
-   ========================================================= */
 .custom-navbar {
   background-color: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px);
@@ -131,9 +127,6 @@ main {
   }
 }
 
-/* =========================================================
-   BUTTONS, CARDS, & THEME OVERRIDES
-   ========================================================= */
 .btn-primary {
   background-color: #0f766e !important;
   border-color: #0f766e !important;
@@ -231,4 +224,79 @@ main {
 .footer-cta-link:hover {
   color: #0f766e !important;
   transform: translateX(3px);
+}
+
+.admin-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.admin-sidebar {
+  width: 270px;
+  min-height: 100vh;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1050;
+}
+
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+.admin-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1040;
+}
+
+.admin-nav-link {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #94a3b8 !important;
+  transition: all 0.2s ease;
+}
+
+.admin-nav-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(3px);
+}
+
+.admin-nav-link.active {
+  background-color: #0f766e !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.35);
+}
+
+.admin-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.text-primary-light {
+  color: #5eead4 !important;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

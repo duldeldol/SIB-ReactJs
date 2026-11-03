@@ -12,10 +12,6 @@ const initialFormState = {
   description: ''
 };
 
-/**
- * AddBookModal - Modal Form Tambah Data Buku Baru
- * Menggunakan React Hooks (useState) untuk mengelola input form secara terkontrol (controlled components).
- */
 function AddBookModal({ isOpen, onClose, onAddBook, existingCategories = [] }) {
   const [formData, setFormData] = useState(initialFormState);
   const [validated, setValidated] = useState(false);
