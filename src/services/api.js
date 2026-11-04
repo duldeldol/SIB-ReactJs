@@ -196,11 +196,20 @@ apiClient.defaults.adapter = async (config) => {
   // Simulasi network latency 200ms agar efek loading state terasa natural
   await new Promise((resolve) => setTimeout(resolve, 200));
 
-  // --- RUTE GENRES ---
-  if (url.endsWith('/genres') || url.endsWith('/genres/')) {
+  // --- RUTE GENRES (/genres atau /genres/:id) ---
+  const genreMatch = url.match(/\/genres(?:\/([^/?#]+))?/);
+  if (genreMatch) {
+    const genreId = genreMatch[1] ? Number(genreMatch[1]) || genreMatch[1] : null;
     let genres = loadFromStorage(STORAGE_KEYS.GENRES, INITIAL_GENRES);
 
     if (method === 'get') {
+      if (genreId) {
+        const item = genres.find((g) => g.id == genreId);
+        if (!item) {
+          return { data: { message: 'Genre tidak ditemukan' }, status: 404, statusText: 'Not Found', headers: {}, config };
+        }
+        return { data: item, status: 200, statusText: 'OK', headers: {}, config };
+      }
       return {
         data: genres,
         status: 200,
@@ -235,13 +244,72 @@ apiClient.defaults.adapter = async (config) => {
         config,
       };
     }
+
+    if (method === 'put') {
+      const payload = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+      const targetId = genreId || payload.id;
+      const index = genres.findIndex((g) => g.id == targetId);
+      if (index === -1) {
+        return { data: { message: 'Genre tidak ditemukan' }, status: 404, statusText: 'Not Found', headers: {}, config };
+      }
+
+      const current = genres[index];
+      const updatedGenre = {
+        ...current,
+        name: payload.name ? payload.name.trim() : current.name,
+        slug: payload.name
+          ? payload.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+          : current.slug,
+        description: payload.description !== undefined ? payload.description.trim() : current.description,
+        updatedAt: new Date().toISOString().split('T')[0],
+      };
+
+      genres[index] = updatedGenre;
+      saveToStorage(STORAGE_KEYS.GENRES, genres);
+
+      return {
+        data: updatedGenre,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+      };
+    }
+
+    if (method === 'delete') {
+      const targetId = genreId;
+      const exists = genres.some((g) => g.id == targetId);
+      if (!exists) {
+        return { data: { message: 'Genre tidak ditemukan' }, status: 404, statusText: 'Not Found', headers: {}, config };
+      }
+
+      genres = genres.filter((g) => g.id != targetId);
+      saveToStorage(STORAGE_KEYS.GENRES, genres);
+
+      return {
+        data: { message: 'Genre berhasil dihapus', id: targetId },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+      };
+    }
   }
 
-  // --- RUTE AUTHORS ---
-  if (url.endsWith('/authors') || url.endsWith('/authors/')) {
+  // --- RUTE AUTHORS (/authors atau /authors/:id) ---
+  const authorMatch = url.match(/\/authors(?:\/([^/?#]+))?/);
+  if (authorMatch) {
+    const authorId = authorMatch[1] ? Number(authorMatch[1]) || authorMatch[1] : null;
     let authors = loadFromStorage(STORAGE_KEYS.AUTHORS, INITIAL_AUTHORS);
 
     if (method === 'get') {
+      if (authorId) {
+        const item = authors.find((a) => a.id == authorId);
+        if (!item) {
+          return { data: { message: 'Author tidak ditemukan' }, status: 404, statusText: 'Not Found', headers: {}, config };
+        }
+        return { data: item, status: 200, statusText: 'OK', headers: {}, config };
+      }
       return {
         data: authors,
         status: 200,
@@ -285,6 +353,58 @@ apiClient.defaults.adapter = async (config) => {
         config,
       };
     }
+
+    if (method === 'put') {
+      const payload = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+      const targetId = authorId || payload.id;
+      const index = authors.findIndex((a) => a.id == targetId);
+      if (index === -1) {
+        return { data: { message: 'Author tidak ditemukan' }, status: 404, statusText: 'Not Found', headers: {}, config };
+      }
+
+      const current = authors[index];
+      const updatedAuthor = {
+        ...current,
+        name: payload.name ? payload.name.trim() : current.name,
+        country: payload.country ? payload.country.trim() : current.country,
+        birthYear: payload.birthYear !== undefined ? parseInt(payload.birthYear, 10) : current.birthYear,
+        activeSince: payload.activeSince !== undefined ? parseInt(payload.activeSince, 10) : current.activeSince,
+        primaryGenre: payload.primaryGenre || current.primaryGenre,
+        avatar: payload.avatar ? payload.avatar.trim() : current.avatar,
+        bio: payload.bio !== undefined ? payload.bio.trim() : current.bio,
+        updatedAt: new Date().toISOString().split('T')[0],
+      };
+
+      authors[index] = updatedAuthor;
+      saveToStorage(STORAGE_KEYS.AUTHORS, authors);
+
+      return {
+        data: updatedAuthor,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+      };
+    }
+
+    if (method === 'delete') {
+      const targetId = authorId;
+      const exists = authors.some((a) => a.id == targetId);
+      if (!exists) {
+        return { data: { message: 'Author tidak ditemukan' }, status: 404, statusText: 'Not Found', headers: {}, config };
+      }
+
+      authors = authors.filter((a) => a.id != targetId);
+      saveToStorage(STORAGE_KEYS.AUTHORS, authors);
+
+      return {
+        data: { message: 'Author berhasil dihapus', id: targetId },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+      };
+    }
   }
 
   // Fallback 404
@@ -316,15 +436,39 @@ export const createGenre = async (genreData) => {
   return response.data;
 };
 
-// 3. Read Authors (Axios GET)
+// 3. Update Genre (Axios PUT)
+export const updateGenre = async (id, genreData) => {
+  const response = await apiClient.put(`/genres/${id}`, genreData);
+  return response.data;
+};
+
+// 4. Delete Genre (Axios DELETE)
+export const deleteGenre = async (id) => {
+  const response = await apiClient.delete(`/genres/${id}`);
+  return response.data;
+};
+
+// 5. Read Authors (Axios GET)
 export const fetchAuthors = async () => {
   const response = await apiClient.get('/authors');
   return response.data;
 };
 
-// 4. Create Author (Axios POST)
+// 6. Create Author (Axios POST)
 export const createAuthor = async (authorData) => {
   const response = await apiClient.post('/authors', authorData);
+  return response.data;
+};
+
+// 7. Update Author (Axios PUT)
+export const updateAuthor = async (id, authorData) => {
+  const response = await apiClient.put(`/authors/${id}`, authorData);
+  return response.data;
+};
+
+// 8. Delete Author (Axios DELETE)
+export const deleteAuthor = async (id) => {
+  const response = await apiClient.delete(`/authors/${id}`);
   return response.data;
 };
 

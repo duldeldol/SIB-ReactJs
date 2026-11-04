@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { fetchGenres, createGenre } from '../../services/api';
+import { fetchGenres, createGenre, updateGenre, deleteGenre } from '../../services/api';
 import GenreModal from '../../components/admin/GenreModal';
+import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 
 function Genres() {
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // State Modal Form (Create & Update)
   const [isModalOpen, setIsModalOpen] = useState(() => {
     return (
       typeof window !== 'undefined' &&
       new URLSearchParams(window.location.search).get('modal') === 'true'
     );
   });
+  const [editingGenre, setEditingGenre] = useState(null);
+
+  // State Modal Konfirmasi Hapus (Delete)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingGenre, setDeletingGenre] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [notification, setNotification] = useState(null);
   const [error, setError] = useState(null);
 
@@ -25,6 +35,16 @@ function Genres() {
         const data = await fetchGenres();
         if (isMounted) {
           setGenres(data);
+          if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('edit') === 'true' && data.length > 0) {
+              setEditingGenre(data[0]);
+              setIsModalOpen(true);
+            } else if (params.get('delete') === 'true' && data.length > 0) {
+              setDeletingGenre(data[0]);
+              setIsDeleteModalOpen(true);
+            }
+          }
         }
       } catch (err) {
         console.error('Gagal mengambil data genre:', err);
@@ -66,12 +86,66 @@ function Genres() {
     setGenres((prev) => [created, ...prev]);
     setNotification({
       type: 'success',
+      title: 'Berhasil Menambahkan Genre!',
       message: `Genre "${created.name}" berhasil ditambahkan ke database!`,
     });
 
     setTimeout(() => {
       setNotification(null);
     }, 4500);
+  };
+
+  // 3. Update Data menggunakan Axios PUT
+  const handleOpenEdit = (genre) => {
+    setEditingGenre(genre);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateGenre = async (id, updatedData) => {
+    const updated = await updateGenre(id, updatedData);
+    setGenres((prev) => prev.map((g) => (g.id === id ? updated : g)));
+    setNotification({
+      type: 'info',
+      title: 'Berhasil Memperbarui Genre!',
+      message: `Genre "${updated.name}" berhasil diperbarui!`,
+    });
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 4500);
+  };
+
+  // 4. Delete Data menggunakan Axios DELETE
+  const handleOpenDelete = (genre) => {
+    setDeletingGenre(genre);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingGenre) return;
+
+    try {
+      setIsDeleting(true);
+      await deleteGenre(deletingGenre.id);
+      setGenres((prev) => prev.filter((g) => g.id !== deletingGenre.id));
+      setNotification({
+        type: 'danger',
+        title: 'Berhasil Menghapus Genre!',
+        message: `Genre "${deletingGenre.name}" telah dihapus dari database!`,
+      });
+
+      setIsDeleteModalOpen(false);
+      setDeletingGenre(null);
+
+      setTimeout(() => {
+        setNotification(null);
+      }, 4500);
+    } catch (err) {
+      console.error('Gagal menghapus genre:', err);
+      alert('Terjadi kesalahan saat menghapus data genre.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Filter pencarian
@@ -96,15 +170,37 @@ function Genres() {
           style={{ zIndex: 1090, marginTop: '80px' }}
         >
           <div
-            className="toast show align-items-center bg-white border border-success border-opacity-50 shadow-lg rounded-4 p-2 animate-fadeIn"
+            className={`toast show align-items-center bg-white border border-${
+              notification.type === 'danger'
+                ? 'danger'
+                : notification.type === 'info'
+                ? 'primary'
+                : 'success'
+            } border-opacity-50 shadow-lg rounded-4 p-2 animate-fadeIn`}
             role="alert"
           >
             <div className="d-flex p-2 align-items-center">
-              <div className="me-3 fs-3 text-success">
-                <i className="fa-solid fa-circle-check"></i>
+              <div
+                className={`me-3 fs-3 text-${
+                  notification.type === 'danger'
+                    ? 'danger'
+                    : notification.type === 'info'
+                    ? 'primary'
+                    : 'success'
+                }`}
+              >
+                <i
+                  className={`fa-solid ${
+                    notification.type === 'danger'
+                      ? 'fa-trash-can'
+                      : notification.type === 'info'
+                      ? 'fa-pen-to-square'
+                      : 'fa-circle-check'
+                  }`}
+                ></i>
               </div>
               <div className="toast-body p-0 flex-grow-1">
-                <div className="fw-bold text-dark small">Berhasil Menambahkan Genre!</div>
+                <div className="fw-bold text-dark small">{notification.title}</div>
                 <div className="text-secondary small">{notification.message}</div>
               </div>
               <button
@@ -123,7 +219,7 @@ function Genres() {
         <div>
           <h2 className="fw-bold text-dark mb-1">Daftar Genre Buku</h2>
           <p className="text-secondary small mb-0">
-            Kelola kategori dan klasifikasi buku pada katalog BookStore. Terhubung dengan operasi Asynchronous Axios.
+            Kelola kategori buku pada katalog BookStore.
           </p>
         </div>
         <div className="d-flex gap-2">
@@ -140,7 +236,10 @@ function Genres() {
           <button
             type="button"
             className="btn btn-primary rounded-pill px-4 btn-sm d-inline-flex align-items-center gap-2 fw-semibold shadow-sm"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingGenre(null);
+              setIsModalOpen(true);
+            }}
           >
             <i className="fa-solid fa-plus-circle"></i>
             <span>Tambah Genre Baru</span>
@@ -242,10 +341,11 @@ function Genres() {
                   <th scope="col" className="ps-4" style={{ width: '60px' }}>No</th>
                   <th scope="col">Nama Genre</th>
                   <th scope="col">Slug Kode</th>
-                  <th scope="col" style={{ minWidth: '240px' }}>Deskripsi</th>
-                  <th scope="col" className="text-center">Koleksi Buku</th>
+                  <th scope="col" style={{ minWidth: '220px' }}>Deskripsi</th>
+                  <th scope="col" className="text-center">Koleksi</th>
                   <th scope="col">Tanggal Dibuat</th>
-                  <th scope="col" className="text-end pe-4">Status</th>
+                  <th scope="col" className="text-center">Status</th>
+                  <th scope="col" className="text-end pe-4" style={{ minWidth: '160px' }}>Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -274,16 +374,38 @@ function Genres() {
                         <i className="fa-regular fa-calendar me-1"></i>
                         {genre.createdAt || '-'}
                       </td>
-                      <td className="text-end pe-4">
+                      <td className="text-center">
                         <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 small">
                           <i className="fa-solid fa-circle-check me-1"></i> Aktif
                         </span>
+                      </td>
+                      <td className="text-end pe-4">
+                        <div className="d-inline-flex gap-1">
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-sm"
+                            title="Edit Data Genre"
+                            onClick={() => handleOpenEdit(genre)}
+                          >
+                            <i className="fa-solid fa-pen-to-square"></i>
+                            <span className="d-none d-md-inline">Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-sm"
+                            title="Hapus Data Genre"
+                            onClick={() => handleOpenDelete(genre)}
+                          >
+                            <i className="fa-solid fa-trash-can"></i>
+                            <span className="d-none d-md-inline">Hapus</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-5">
+                    <td colSpan="8" className="text-center py-5">
                       <div className="py-4">
                         <i className="fa-solid fa-tags text-muted fs-1 mb-3 d-block"></i>
                         <h6 className="fw-bold text-dark">Tidak Ada Genre Ditemukan</h6>
@@ -304,7 +426,10 @@ function Genres() {
                           <button
                             type="button"
                             className="btn btn-primary btn-sm rounded-pill px-3"
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={() => {
+                              setEditingGenre(null);
+                              setIsModalOpen(true);
+                            }}
                           >
                             + Tambah Genre Pertama
                           </button>
@@ -319,11 +444,30 @@ function Genres() {
         )}
       </div>
 
-      {/* Modal Dialog Form Tambah Genre */}
+      {/* Modal Dialog Form Tambah / Edit Genre (Axios POST & PUT) */}
       <GenreModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingGenre(null);
+        }}
         onAddGenre={handleAddGenre}
+        onUpdateGenre={handleUpdateGenre}
+        initialData={editingGenre}
+      />
+
+      {/* Modal Dialog Konfirmasi Hapus Data (Axios DELETE) */}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingGenre(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Konfirmasi Hapus Genre Buku"
+        itemName={deletingGenre ? deletingGenre.name : ''}
+        message="Apakah Anda yakin ingin menghapus kategori genre buku ini dari database? Tindakan ini tidak dapat dibatalkan."
+        isDeleting={isDeleting}
       />
     </div>
   );

@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAuthors, createAuthor } from '../../services/api';
+import { fetchAuthors, createAuthor, updateAuthor, deleteAuthor } from '../../services/api';
 import AuthorModal from '../../components/admin/AuthorModal';
+import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 
 function Authors() {
   const [authors, setAuthors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // State Modal Form (Create & Update)
   const [isModalOpen, setIsModalOpen] = useState(() => {
     return (
       typeof window !== 'undefined' &&
       new URLSearchParams(window.location.search).get('modal') === 'true'
     );
   });
+  const [editingAuthor, setEditingAuthor] = useState(null);
+
+  // State Modal Konfirmasi Hapus (Delete)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingAuthor, setDeletingAuthor] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [notification, setNotification] = useState(null);
   const [error, setError] = useState(null);
 
@@ -25,6 +35,16 @@ function Authors() {
         const data = await fetchAuthors();
         if (isMounted) {
           setAuthors(data);
+          if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('edit') === 'true' && data.length > 0) {
+              setEditingAuthor(data[0]);
+              setIsModalOpen(true);
+            } else if (params.get('delete') === 'true' && data.length > 0) {
+              setDeletingAuthor(data[0]);
+              setIsDeleteModalOpen(true);
+            }
+          }
         }
       } catch (err) {
         console.error('Gagal mengambil data author:', err);
@@ -66,12 +86,66 @@ function Authors() {
     setAuthors((prev) => [created, ...prev]);
     setNotification({
       type: 'success',
+      title: 'Berhasil Menambahkan Author!',
       message: `Author "${created.name}" berhasil ditambahkan ke database!`,
     });
 
     setTimeout(() => {
       setNotification(null);
     }, 4500);
+  };
+
+  // 3. Update Data menggunakan Axios PUT
+  const handleOpenEdit = (author) => {
+    setEditingAuthor(author);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateAuthor = async (id, updatedData) => {
+    const updated = await updateAuthor(id, updatedData);
+    setAuthors((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    setNotification({
+      type: 'info',
+      title: 'Berhasil Memperbarui Author!',
+      message: `Profil "${updated.name}" berhasil diperbarui!`,
+    });
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 4500);
+  };
+
+  // 4. Delete Data menggunakan Axios DELETE
+  const handleOpenDelete = (author) => {
+    setDeletingAuthor(author);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingAuthor) return;
+
+    try {
+      setIsDeleting(true);
+      await deleteAuthor(deletingAuthor.id);
+      setAuthors((prev) => prev.filter((a) => a.id !== deletingAuthor.id));
+      setNotification({
+        type: 'danger',
+        title: 'Berhasil Menghapus Author!',
+        message: `Profil "${deletingAuthor.name}" telah dihapus dari database!`,
+      });
+
+      setIsDeleteModalOpen(false);
+      setDeletingAuthor(null);
+
+      setTimeout(() => {
+        setNotification(null);
+      }, 4500);
+    } catch (err) {
+      console.error('Gagal menghapus author:', err);
+      alert('Terjadi kesalahan saat menghapus data penulis.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Filter pencarian
@@ -100,15 +174,37 @@ function Authors() {
           style={{ zIndex: 1090, marginTop: '80px' }}
         >
           <div
-            className="toast show align-items-center bg-white border border-success border-opacity-50 shadow-lg rounded-4 p-2 animate-fadeIn"
+            className={`toast show align-items-center bg-white border border-${
+              notification.type === 'danger'
+                ? 'danger'
+                : notification.type === 'info'
+                ? 'primary'
+                : 'success'
+            } border-opacity-50 shadow-lg rounded-4 p-2 animate-fadeIn`}
             role="alert"
           >
             <div className="d-flex p-2 align-items-center">
-              <div className="me-3 fs-3 text-success">
-                <i className="fa-solid fa-circle-check"></i>
+              <div
+                className={`me-3 fs-3 text-${
+                  notification.type === 'danger'
+                    ? 'danger'
+                    : notification.type === 'info'
+                    ? 'primary'
+                    : 'success'
+                }`}
+              >
+                <i
+                  className={`fa-solid ${
+                    notification.type === 'danger'
+                      ? 'fa-trash-can'
+                      : notification.type === 'info'
+                      ? 'fa-pen-to-square'
+                      : 'fa-circle-check'
+                  }`}
+                ></i>
               </div>
               <div className="toast-body p-0 flex-grow-1">
-                <div className="fw-bold text-dark small">Berhasil Menambahkan Penulis!</div>
+                <div className="fw-bold text-dark small">{notification.title}</div>
                 <div className="text-secondary small">{notification.message}</div>
               </div>
               <button
@@ -127,7 +223,7 @@ function Authors() {
         <div>
           <h2 className="fw-bold text-dark mb-1">Daftar Penulis & Author</h2>
           <p className="text-secondary small mb-0">
-            Kelola profil kreator dan penulis buku di BookStore. Terhubung dengan operasi Asynchronous Axios.
+            Kelola profil kreator dan penulis buku di BookStore.
           </p>
         </div>
         <div className="d-flex gap-2">
@@ -144,7 +240,10 @@ function Authors() {
           <button
             type="button"
             className="btn btn-primary rounded-pill px-4 btn-sm d-inline-flex align-items-center gap-2 fw-semibold shadow-sm"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingAuthor(null);
+              setIsModalOpen(true);
+            }}
           >
             <i className="fa-solid fa-user-plus"></i>
             <span>Tambah Author Baru</span>
@@ -198,7 +297,7 @@ function Authors() {
                 <i className="fa-solid fa-earth-americas fs-4"></i>
               </div>
               <div>
-                <span className="text-muted small d-block">Penulis Internasional</span>
+                <span className="text-muted small d-block">Penulis Mancanegara</span>
                 <span className="fs-4 fw-bold text-dark">{internationalAuthorsCount} Penulis</span>
               </div>
             </div>
@@ -206,18 +305,18 @@ function Authors() {
         </div>
       </div>
 
-      {/* Kontainer Tabel Penulis */}
+      {/* Kontainer Tabel & Pencarian */}
       <div className="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
         {/* Table Toolbar */}
         <div className="p-3 px-md-4 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 bg-white">
-          <div className="input-group shadow-sm rounded-pill overflow-hidden border bg-light" style={{ maxWidth: '400px' }}>
+          <div className="input-group shadow-sm rounded-pill overflow-hidden border bg-light" style={{ maxWidth: '380px' }}>
             <span className="input-group-text bg-light border-0 ps-3">
               <i className="fa-solid fa-magnifying-glass text-secondary"></i>
             </span>
             <input
               type="text"
               className="form-control bg-light border-0 py-2 small"
-              placeholder="Cari nama penulis, negara, atau biografi..."
+              placeholder="Cari penulis berdasarkan nama, genre, atau bio..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -265,8 +364,9 @@ function Authors() {
                   <th scope="col">Asal Negara</th>
                   <th scope="col">Spesialisasi Genre</th>
                   <th scope="col">Mulai Aktif</th>
-                  <th scope="col" style={{ minWidth: '280px' }}>Biografi Ringkas</th>
-                  <th scope="col" className="text-end pe-4">Status</th>
+                  <th scope="col" style={{ minWidth: '240px' }}>Biografi Ringkas</th>
+                  <th scope="col" className="text-center">Status</th>
+                  <th scope="col" className="text-end pe-4" style={{ minWidth: '160px' }}>Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -310,20 +410,42 @@ function Authors() {
                         Sejak {author.activeSince || '-'}
                       </td>
                       <td className="text-secondary small">
-                        <p className="mb-0 text-truncate-2" style={{ maxWidth: '340px', lineHeight: '1.4' }}>
+                        <p className="mb-0 text-truncate-2" style={{ maxWidth: '300px', lineHeight: '1.4' }}>
                           {author.bio || '-'}
                         </p>
                       </td>
-                      <td className="text-end pe-4">
+                      <td className="text-center">
                         <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 small">
                           <i className="fa-solid fa-check me-1"></i> Terverifikasi
                         </span>
+                      </td>
+                      <td className="text-end pe-4">
+                        <div className="d-inline-flex gap-1">
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-sm"
+                            title="Edit Data Author"
+                            onClick={() => handleOpenEdit(author)}
+                          >
+                            <i className="fa-solid fa-pen-to-square"></i>
+                            <span className="d-none d-md-inline">Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-sm"
+                            title="Hapus Data Author"
+                            onClick={() => handleOpenDelete(author)}
+                          >
+                            <i className="fa-solid fa-trash-can"></i>
+                            <span className="d-none d-md-inline">Hapus</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-5">
+                    <td colSpan="8" className="text-center py-5">
                       <div className="py-4">
                         <i className="fa-solid fa-feather-pointed text-muted fs-1 mb-3 d-block"></i>
                         <h6 className="fw-bold text-dark">Tidak Ada Penulis Ditemukan</h6>
@@ -344,7 +466,10 @@ function Authors() {
                           <button
                             type="button"
                             className="btn btn-primary btn-sm rounded-pill px-3"
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={() => {
+                              setEditingAuthor(null);
+                              setIsModalOpen(true);
+                            }}
                           >
                             + Tambah Author Pertama
                           </button>
@@ -359,11 +484,30 @@ function Authors() {
         )}
       </div>
 
-      {/* Modal Dialog Form Tambah Author */}
+      {/* Modal Dialog Form Tambah / Edit Author (Axios POST & PUT) */}
       <AuthorModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingAuthor(null);
+        }}
         onAddAuthor={handleAddAuthor}
+        onUpdateAuthor={handleUpdateAuthor}
+        initialData={editingAuthor}
+      />
+
+      {/* Modal Dialog Konfirmasi Hapus Author (Axios DELETE) */}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingAuthor(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Konfirmasi Hapus Author & Penulis"
+        itemName={deletingAuthor ? deletingAuthor.name : ''}
+        message="Apakah Anda yakin ingin menghapus data profil penulis ini dari database? Tindakan ini tidak dapat dibatalkan."
+        isDeleting={isDeleting}
       />
     </div>
   );

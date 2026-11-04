@@ -38,8 +38,7 @@ function Dashboard() {
               Selamat Datang di <span className="text-primary">Admin Portal</span>
             </h2>
             <p className="text-secondary mb-0" style={{ maxWidth: '620px', lineHeight: '1.6' }}>
-              Pusat pengelolaan master data BookStore. Di sini Anda dapat melakukan pembacaan (Read Data)
-              dan penambahan (Create Data) untuk kategori genre serta profil penulis buku secara asinkron.
+              Pusat pengelolaan master data BookStore.
             </p>
           </div>
           <div className="col-lg-4 text-lg-end">

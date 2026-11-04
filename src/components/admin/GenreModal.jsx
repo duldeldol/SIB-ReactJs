@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
 
-function GenreModal({ isOpen, onClose, onAddGenre }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-  });
+function GenreModal({ isOpen, onClose, onAddGenre, onUpdateGenre, onSubmit, initialData = null }) {
+  const isEdit = Boolean(initialData);
+
+  const [formData, setFormData] = useState(() => ({
+    name: initialData?.name || '',
+    description: initialData?.description || '',
+  }));
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Sinkronisasi state saat initialData berubah (pola resmi React: adjusting state during render)
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
+    setFormData({
+      name: initialData?.name || '',
+      description: initialData?.description || '',
+    });
+    setErrorMessage('');
+  }
 
   if (!isOpen) return null;
 
@@ -25,19 +38,28 @@ function GenreModal({ isOpen, onClose, onAddGenre }) {
 
     try {
       setIsSubmitting(true);
-      await onAddGenre({
+      const payload = {
         name: formData.name.trim(),
         description: formData.description.trim() || 'Koleksi buku dengan tema ini.',
-      });
+      };
 
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-      });
+      if (isEdit) {
+        if (onUpdateGenre) {
+          await onUpdateGenre(initialData.id, payload);
+        } else if (onSubmit) {
+          await onSubmit(payload, initialData.id);
+        }
+      } else {
+        if (onAddGenre) {
+          await onAddGenre(payload);
+        } else if (onSubmit) {
+          await onSubmit(payload);
+        }
+      }
+
       onClose();
     } catch (err) {
-      setErrorMessage(err.message || 'Terjadi kesalahan saat menambahkan genre.');
+      setErrorMessage(err.message || 'Terjadi kesalahan saat memproses data genre.');
     } finally {
       setIsSubmitting(false);
     }
@@ -52,7 +74,7 @@ function GenreModal({ isOpen, onClose, onAddGenre }) {
       style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)' }}
     >
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden animate-fadeIn">
           {/* Header */}
           <div className="modal-header bg-primary text-white p-3 p-md-4 border-0">
             <div className="d-flex align-items-center gap-2">
@@ -60,11 +82,12 @@ function GenreModal({ isOpen, onClose, onAddGenre }) {
                 className="d-flex align-items-center justify-content-center bg-white bg-opacity-25 rounded-3 text-white"
                 style={{ width: '36px', height: '36px' }}
               >
-                <i className="fa-solid fa-tags"></i>
+                <i className={isEdit ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-tags'}></i>
               </div>
               <div>
-                <h5 className="modal-title fw-bold mb-0">Tambah Genre Buku Baru</h5>
-                <small className="text-white-50">Operasi Create via Axios POST Request</small>
+                <h5 className="modal-title fw-bold mb-0">
+                  {isEdit ? 'Edit Data Genre Buku' : 'Tambah Genre Buku Baru'}
+                </h5>
               </div>
             </div>
             <button
@@ -148,8 +171,8 @@ function GenreModal({ isOpen, onClose, onAddGenre }) {
                   </>
                 ) : (
                   <>
-                    <i className="fa-solid fa-floppy-disk"></i>
-                    <span>Simpan Genre</span>
+                    <i className={isEdit ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-plus-circle'}></i>
+                    <span>{isEdit ? 'Simpan Perubahan' : 'Simpan Genre'}</span>
                   </>
                 )}
               </button>

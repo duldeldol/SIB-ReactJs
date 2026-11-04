@@ -2,18 +2,43 @@ import React, { useState } from 'react';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-function AuthorModal({ isOpen, onClose, onAddAuthor }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    country: 'Indonesia',
-    birthYear: '',
-    activeSince: '',
-    primaryGenre: 'Teknologi & Pemrograman',
-    avatar: '',
-    bio: '',
-  });
+function AuthorModal({
+  isOpen,
+  onClose,
+  onAddAuthor,
+  onUpdateAuthor,
+  onSubmit,
+  initialData = null,
+}) {
+  const isEdit = Boolean(initialData);
+
+  const [formData, setFormData] = useState(() => ({
+    name: initialData?.name || '',
+    country: initialData?.country || 'Indonesia',
+    birthYear: initialData?.birthYear || '',
+    activeSince: initialData?.activeSince || '',
+    primaryGenre: initialData?.primaryGenre || 'Teknologi & Pemrograman',
+    avatar: initialData?.avatar || '',
+    bio: initialData?.bio || '',
+  }));
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Sinkronisasi state saat initialData berubah (pola resmi React: adjusting state during render)
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
+    setFormData({
+      name: initialData?.name || '',
+      country: initialData?.country || 'Indonesia',
+      birthYear: initialData?.birthYear || '',
+      activeSince: initialData?.activeSince || '',
+      primaryGenre: initialData?.primaryGenre || 'Teknologi & Pemrograman',
+      avatar: initialData?.avatar || '',
+      bio: initialData?.bio || '',
+    });
+    setErrorMessage('');
+  }
 
   if (!isOpen) return null;
 
@@ -32,7 +57,7 @@ function AuthorModal({ isOpen, onClose, onAddAuthor }) {
 
     try {
       setIsSubmitting(true);
-      await onAddAuthor({
+      const payload = {
         name: formData.name.trim(),
         country: formData.country.trim() || 'Indonesia',
         birthYear: formData.birthYear ? parseInt(formData.birthYear, 10) : CURRENT_YEAR - 30,
@@ -40,21 +65,25 @@ function AuthorModal({ isOpen, onClose, onAddAuthor }) {
         primaryGenre: formData.primaryGenre,
         avatar: formData.avatar.trim() || null,
         bio: formData.bio.trim() || 'Penulis buku di BookStore.',
-      });
+      };
 
-      // Reset form
-      setFormData({
-        name: '',
-        country: 'Indonesia',
-        birthYear: '',
-        activeSince: '',
-        primaryGenre: 'Teknologi & Pemrograman',
-        avatar: '',
-        bio: '',
-      });
+      if (isEdit) {
+        if (onUpdateAuthor) {
+          await onUpdateAuthor(initialData.id, payload);
+        } else if (onSubmit) {
+          await onSubmit(payload, initialData.id);
+        }
+      } else {
+        if (onAddAuthor) {
+          await onAddAuthor(payload);
+        } else if (onSubmit) {
+          await onSubmit(payload);
+        }
+      }
+
       onClose();
     } catch (err) {
-      setErrorMessage(err.message || 'Terjadi kesalahan saat menambahkan data author.');
+      setErrorMessage(err.message || 'Terjadi kesalahan saat memproses data author.');
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +98,7 @@ function AuthorModal({ isOpen, onClose, onAddAuthor }) {
       style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)' }}
     >
       <div className="modal-dialog modal-dialog-centered modal-lg">
-        <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden animate-fadeIn">
           {/* Header */}
           <div className="modal-header bg-primary text-white p-3 p-md-4 border-0">
             <div className="d-flex align-items-center gap-2">
@@ -77,11 +106,12 @@ function AuthorModal({ isOpen, onClose, onAddAuthor }) {
                 className="d-flex align-items-center justify-content-center bg-white bg-opacity-25 rounded-3 text-white"
                 style={{ width: '36px', height: '36px' }}
               >
-                <i className="fa-solid fa-feather-pointed"></i>
+                <i className={isEdit ? 'fa-solid fa-user-pen' : 'fa-solid fa-feather-pointed'}></i>
               </div>
               <div>
-                <h5 className="modal-title fw-bold mb-0">Tambah Author & Penulis Baru</h5>
-                <small className="text-white-50">Operasi Create via Axios POST Request</small>
+                <h5 className="modal-title fw-bold mb-0">
+                  {isEdit ? 'Edit Profil Penulis & Author' : 'Tambah Author & Penulis Baru'}
+                </h5>
               </div>
             </div>
             <button
@@ -268,8 +298,8 @@ function AuthorModal({ isOpen, onClose, onAddAuthor }) {
                   </>
                 ) : (
                   <>
-                    <i className="fa-solid fa-floppy-disk"></i>
-                    <span>Simpan Author</span>
+                    <i className={isEdit ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-user-plus'}></i>
+                    <span>{isEdit ? 'Simpan Perubahan' : 'Simpan Author'}</span>
                   </>
                 )}
               </button>
