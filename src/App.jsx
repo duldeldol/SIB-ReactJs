@@ -6,17 +6,12 @@ import Home from './pages/Home';
 import Book from './pages/Book';
 import Team from './pages/Team';
 import Contact from './pages/Contact';
+import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/admin/Dashboard';
 import Genres from './pages/admin/Genres';
 import Authors from './pages/admin/Authors';
 
-/**
- * App - Konfigurasi Utama Declarative Routing
- * Mendukung:
- * 1. MainLayout (Area Publik Pengunjung Toko: Home, Books, Team, Contact)
- * 2. AdminLayout (Area Panel Pengelola: Dashboard, Genres Read/Create, Authors Read/Create)
- */
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +30,9 @@ function App() {
 
           {/* Halaman Kontak & Bantuan */}
           <Route path="contact" element={<Contact />} />
+
+          {/* Halaman Registrasi Pengguna Baru (Tugas 6) */}
+          <Route path="register" element={<Register />} />
         </Route>
 
         {/* Kategori Layout Admin (Admin Sidebar & Topbar - Tugas 4) */}

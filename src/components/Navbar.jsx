@@ -100,13 +100,12 @@ function Navbar() {
             >
               <i className="fa-solid fa-right-to-bracket me-1"></i> Login
             </button>
-            <button
-              type="button"
+            <Link
+              to="/register"
               className="btn btn-primary px-3 py-2 rounded-pill fw-semibold shadow-sm"
-              onClick={() => alert('Fitur Register akan segera hadir!')}
             >
               <i className="fa-solid fa-user-plus me-1"></i> Register
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -182,16 +181,13 @@ function Navbar() {
               >
                 <i className="fa-solid fa-right-to-bracket me-1"></i> Login
               </button>
-              <button
-                type="button"
-                className="btn btn-primary w-50 py-2 rounded-pill fw-semibold"
-                onClick={() => {
-                  closeNav();
-                  alert('Fitur Register akan segera hadir!');
-                }}
+              <Link
+                to="/register"
+                onClick={closeNav}
+                className="btn btn-primary w-50 py-2 rounded-pill fw-semibold text-center"
               >
                 <i className="fa-solid fa-user-plus me-1"></i> Register
-              </button>
+              </Link>
             </div>
           </div>
         )}

@@ -1,17 +1,9 @@
 import axios from 'axios';
 
-/**
- * api.js - Layanan HTTP Client Berbasis Axios
- * Mengimplementasikan konsep materi CRUD React JS (NF Academy):
- * - Axios instance dengan baseURL & timeout
- * - Operasi Asynchronous (async/await & Promise)
- * - Persistent storage (LocalStorage) dengan initial mock data yang sinkron
- * - Mendukung backend API nyata (via VITE_API_URL) maupun fallback lokal tanpa server.
- */
-
 const STORAGE_KEYS = {
   GENRES: 'bookstore_admin_genres_v2',
   AUTHORS: 'bookstore_admin_authors',
+  USERS: 'bookstore_users',
 };
 
 // Pembersihan otomatis cache genre percobaan lama dari browser
@@ -148,6 +140,17 @@ const INITIAL_AUTHORS = [
     bio: 'Tokoh sastrawan besar Indonesia nominator Penghargaan Nobel Sastra, pencipta mahakarya Tetralogi Buru yang mendunia.',
     booksCount: 1,
     createdAt: '2026-10-06'
+  }
+];
+
+// Data Awal Pengguna Terdaftar (Default Mock)
+const INITIAL_USERS = [
+  {
+    id: 1,
+    fullName: 'Haydar Ali Ayyubi',
+    email: 'haydar@example.com',
+    username: 'haydarali',
+    createdAt: '2026-10-01T08:00:00.000Z'
   }
 ];
 
@@ -407,6 +410,73 @@ apiClient.defaults.adapter = async (config) => {
     }
   }
 
+  // --- RUTE USERS & REGISTRASI (/auth/register atau /users) ---
+  if (url.includes('/auth/register') || (url.includes('/users') && method === 'post')) {
+    const payload = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+    let users = loadFromStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
+
+    const emailTrimmed = (payload.email || '').trim().toLowerCase();
+    const usernameTrimmed = (payload.username || '').trim().toLowerCase();
+
+    // Validasi keunikan email
+    const duplicateEmail = users.some((u) => u.email?.toLowerCase() === emailTrimmed);
+    if (duplicateEmail) {
+      return {
+        data: { message: 'Alamat email sudah terdaftar. Silakan gunakan email lain.' },
+        status: 409,
+        statusText: 'Conflict',
+        headers: {},
+        config,
+      };
+    }
+
+    // Validasi keunikan username
+    const duplicateUsername = users.some((u) => u.username?.toLowerCase() === usernameTrimmed);
+    if (duplicateUsername) {
+      return {
+        data: { message: 'Username sudah digunakan. Silakan pilih username lain.' },
+        status: 409,
+        statusText: 'Conflict',
+        headers: {},
+        config,
+      };
+    }
+
+    const newUser = {
+      id: Date.now(),
+      fullName: payload.fullName?.trim() || 'Pengguna Baru',
+      email: emailTrimmed,
+      username: usernameTrimmed,
+      createdAt: new Date().toISOString(),
+    };
+
+    users = [newUser, ...users];
+    saveToStorage(STORAGE_KEYS.USERS, users);
+
+    return {
+      data: {
+        success: true,
+        message: 'Pendaftaran akun berhasil!',
+        user: newUser,
+      },
+      status: 201,
+      statusText: 'Created',
+      headers: {},
+      config,
+    };
+  }
+
+  if (url.includes('/users') && method === 'get') {
+    const users = loadFromStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
+    return {
+      data: users,
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  }
+
   // Fallback 404
   return {
     data: { message: 'Not Found' },
@@ -416,13 +486,6 @@ apiClient.defaults.adapter = async (config) => {
     config,
   };
 };
-
-/**
- * =========================================================
- * Service Functions untuk Konsumsi di Komponen
- * Sesuai panduan materi (async/await, Axios GET & POST)
- * =========================================================
- */
 
 // 1. Read Genres (Axios GET)
 export const fetchGenres = async () => {
@@ -472,10 +535,23 @@ export const deleteAuthor = async (id) => {
   return response.data;
 };
 
-// 5. Reset data ke default (Utilitas opsional)
+// 9. Registrasi Pengguna Baru (Axios POST)
+export const registerUser = async (userData) => {
+  const response = await apiClient.post('/auth/register', userData);
+  return response.data;
+};
+
+// 10. Ambil Daftar Pengguna Terdaftar (Axios GET)
+export const fetchUsers = async () => {
+  const response = await apiClient.get('/users');
+  return response.data;
+};
+
+// 11. Reset data ke default (Utilitas opsional)
 export const resetAdminData = () => {
   saveToStorage(STORAGE_KEYS.GENRES, INITIAL_GENRES);
   saveToStorage(STORAGE_KEYS.AUTHORS, INITIAL_AUTHORS);
+  saveToStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
 };
 
 export default apiClient;
