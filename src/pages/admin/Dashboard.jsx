@@ -35,7 +35,7 @@ function Dashboard() {
         <div className="row align-items-center g-4 position-relative" style={{ zIndex: 1 }}>
           <div className="col-lg-8">
             <h2 className="display-6 fw-bold text-dark mb-2">
-              Selamat Datang di <span className="text-primary">Admin Portal</span>
+              Selamat Datang di <span className="text-primary">Book Admin</span>
             </h2>
             <p className="text-secondary mb-0" style={{ maxWidth: '620px', lineHeight: '1.6' }}>
               Pusat pengelolaan master data BookStore.

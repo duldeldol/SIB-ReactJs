@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
+import { useAuth } from '../context/useAuth';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated, user, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleNav = () => {
     setIsOpen(!isOpen);
@@ -12,11 +15,19 @@ function Navbar() {
     setIsOpen(false);
   };
 
+  const handleLogout = () => {
+    closeNav();
+    logout();
+    navigate('/login');
+  };
+
+  const firstName = user?.fullName ? user.fullName.split(' ')[0] : 'Pengguna';
+
   return (
     <header className="custom-navbar sticky-top border-bottom">
       <div className="container py-2">
         <div className="d-flex align-items-center justify-content-between">
-          {/* Logo & Brand Name (Format Asli) */}
+          {/* Logo & Brand Name */}
           <Link
             to="/"
             onClick={closeNav}
@@ -83,29 +94,71 @@ function Navbar() {
             </NavLink>
           </nav>
 
-          {/* Desktop Auth Action Buttons & Admin Shortcut */}
+          {/* Desktop Auth Action Buttons & Profile */}
           <div className="d-none d-lg-flex align-items-center gap-2">
-            <Link
-              to="/admin"
-              className="btn btn-outline-dark me-1 px-3 py-2 rounded-pill fw-semibold small shadow-sm d-inline-flex align-items-center gap-2"
-              title="Masuk ke Panel Admin (Tugas 4)"
-            >
-              <i className="fa-solid fa-book-bookmark text-primary"></i>
-              <span>Admin Panel</span>
-            </Link>
-            <button
-              type="button"
-              className="btn btn-outline-primary me-2 px-3 py-2 rounded-pill fw-semibold"
-              onClick={() => alert('Fitur Login akan segera hadir!')}
-            >
-              <i className="fa-solid fa-right-to-bracket me-1"></i> Login
-            </button>
-            <Link
-              to="/register"
-              className="btn btn-primary px-3 py-2 rounded-pill fw-semibold shadow-sm"
-            >
-              <i className="fa-solid fa-user-plus me-1"></i> Register
-            </Link>
+            {!isAuthenticated ? (
+              <>
+                <Link
+                  to="/login"
+                  className="btn btn-outline-primary px-3 py-2 rounded-pill fw-semibold"
+                >
+                  <i className="fa-solid fa-right-to-bracket me-1"></i> Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn btn-primary px-3 py-2 rounded-pill fw-semibold shadow-sm text-white"
+                  style={{ backgroundColor: '#0f766e', borderColor: '#0f766e' }}
+                >
+                  <i className="fa-solid fa-user-plus me-1"></i> Register
+                </Link>
+              </>
+            ) : (
+              <div className="d-flex align-items-center gap-2">
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="btn px-3 py-1.5 rounded-pill fw-semibold small shadow-sm d-inline-flex align-items-center gap-2 text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)',
+                      border: 'none',
+                    }}
+                    title="Buka Portal Pengelolaan Toko"
+                  >
+                    <i className="fa-solid fa-shield-halved text-white"></i>
+                    <span>Kelola Toko</span>
+                  </Link>
+                )}
+
+                <Link
+                  to="/profile"
+                  className="btn btn-light border px-3 py-1.5 rounded-pill fw-semibold d-inline-flex align-items-center gap-2 text-dark text-decoration-none shadow-xs"
+                  title="Lihat Profil Saya"
+                >
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                    style={{
+                      width: 26,
+                      height: 26,
+                      backgroundColor: isAdmin ? '#dc2626' : '#0f766e',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    {firstName.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="small">{firstName}</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: '32px', height: '32px' }}
+                  title="Keluar dari akun"
+                >
+                  <i className="fa-solid fa-arrow-right-from-bracket" style={{ fontSize: '0.8rem' }}></i>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -157,37 +210,78 @@ function Navbar() {
                 <i className="fa-solid fa-envelope nav-icon"></i>
                 <span>Contact</span>
               </NavLink>
-
-              <NavLink
-                to="/admin"
-                onClick={closeNav}
-                className={({ isActive }) =>
-                  `nav-link-item mobile ${isActive ? 'active' : ''}`
-                }
-              >
-                <i className="fa-solid fa-book-bookmark nav-icon text-primary"></i>
-                <span>Admin Panel</span>
-              </NavLink>
             </div>
 
-            <div className="d-flex gap-2 pt-2 border-top">
-              <button
-                type="button"
-                className="btn btn-outline-primary w-50 py-2 rounded-pill fw-semibold"
-                onClick={() => {
-                  closeNav();
-                  alert('Fitur Login akan segera hadir!');
-                }}
-              >
-                <i className="fa-solid fa-right-to-bracket me-1"></i> Login
-              </button>
-              <Link
-                to="/register"
-                onClick={closeNav}
-                className="btn btn-primary w-50 py-2 rounded-pill fw-semibold text-center"
-              >
-                <i className="fa-solid fa-user-plus me-1"></i> Register
-              </Link>
+            <div className="pt-2 border-top">
+              {!isAuthenticated ? (
+                <div className="d-flex gap-2">
+                  <Link
+                    to="/login"
+                    onClick={closeNav}
+                    className="btn btn-outline-primary w-50 py-2 rounded-pill fw-semibold text-center text-decoration-none"
+                  >
+                    <i className="fa-solid fa-right-to-bracket me-1"></i> Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={closeNav}
+                    className="btn btn-primary w-50 py-2 rounded-pill fw-semibold text-center text-decoration-none text-white"
+                    style={{ backgroundColor: '#0f766e', borderColor: '#0f766e' }}
+                  >
+                    <i className="fa-solid fa-user-plus me-1"></i> Register
+                  </Link>
+                </div>
+              ) : (
+                <div className="d-flex flex-column gap-2">
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={closeNav}
+                      className="btn text-white w-100 py-2 rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm text-decoration-none"
+                      style={{
+                        background: 'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)',
+                        border: 'none',
+                      }}
+                    >
+                      <i className="fa-solid fa-shield-halved"></i>
+                      <span>Kelola Toko</span>
+                    </Link>
+                  )}
+                  <Link
+                    to="/profile"
+                    onClick={closeNav}
+                    className="btn btn-light d-flex align-items-center justify-content-between p-2 rounded-3 border text-decoration-none"
+                  >
+                    <div className="d-flex align-items-center gap-2">
+                      <div
+                        className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          backgroundColor: isAdmin ? '#dc2626' : '#0f766e',
+                        }}
+                      >
+                        {firstName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="text-start">
+                        <div className="fw-semibold text-dark small">{user?.fullName}</div>
+                        <div className="text-muted" style={{ fontSize: '0.75rem' }}>@{user?.username}</div>
+                      </div>
+                    </div>
+                    <span className="small text-muted fw-semibold">
+                      {isAdmin ? 'Admin Toko' : 'Member'}
+                    </span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="btn btn-outline-danger w-100 py-2 rounded-pill fw-semibold"
+                  >
+                    <i className="fa-solid fa-arrow-right-from-bracket me-2"></i> Keluar Akun
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

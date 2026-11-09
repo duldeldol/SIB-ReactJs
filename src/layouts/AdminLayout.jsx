@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, Link, useLocation } from 'react-router';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router';
 import ScrollToTop from '../components/ScrollToTop';
+import { useAuth } from '../context/useAuth';
 
 function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // Helper title berdasarkan path
   const getPageTitle = () => {
@@ -14,6 +17,12 @@ function AdminLayout() {
   };
 
   const closeSidebar = () => setSidebarOpen(false);
+
+  const handleLogout = () => {
+    closeSidebar();
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="admin-wrapper d-flex min-vh-100 bg-light">
@@ -110,8 +119,26 @@ function AdminLayout() {
           </li>
         </ul>
 
-        {/* Bottom Shortcut: Kembali ke Toko */}
-        <div className="pt-3 mt-auto border-top border-secondary border-opacity-25">
+        {/* User Admin Info & Actions */}
+        <div className="pt-3 mt-auto border-top border-secondary border-opacity-25 d-flex flex-column gap-2">
+          <Link
+            to="/profile"
+            onClick={closeSidebar}
+            className="d-flex align-items-center gap-2 p-2 rounded-3 text-white text-decoration-none bg-secondary bg-opacity-25 hover-bg-secondary"
+            title="Lihat Profil Admin"
+          >
+            <div
+              className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold bg-danger"
+              style={{ width: 32, height: 32, fontSize: '0.8rem' }}
+            >
+              {user?.fullName?.charAt(0).toUpperCase() || 'A'}
+            </div>
+            <div className="overflow-hidden">
+              <div className="fw-semibold small text-truncate">{user?.fullName || 'Admin'}</div>
+              <div className="text-secondary" style={{ fontSize: '0.7rem' }}>Administrator</div>
+            </div>
+          </Link>
+
           <Link
             to="/"
             className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2 rounded-pill py-2 small fw-semibold"
@@ -119,6 +146,15 @@ function AdminLayout() {
             <i className="fa-solid fa-store"></i>
             <span>Kembali ke Toko</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 rounded-pill py-1 small fw-semibold"
+          >
+            <i className="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Logout Admin</span>
+          </button>
         </div>
       </aside>
 
@@ -144,18 +180,15 @@ function AdminLayout() {
           </div>
 
           <div className="d-flex align-items-center gap-2">
-            <Link
-              to="/books"
-              className="btn btn-sm btn-outline-primary rounded-pill d-none d-md-inline-flex align-items-center gap-2 px-3 py-1 fw-semibold"
-            >
-              <i className="fa-solid fa-book-open"></i>
-              <span>Katalog Buku</span>
-            </Link>
             <div className="vr mx-2 d-none d-md-block" style={{ height: '24px' }}></div>
-            <div className="d-flex align-items-center gap-2 bg-light px-3 py-1 rounded-pill border">
-              <i className="fa-solid fa-shield-halved text-primary"></i>
-              <span className="small fw-semibold text-dark">Admin</span>
-            </div>
+            <Link
+              to="/profile"
+              className="d-flex align-items-center gap-2 bg-light px-3 py-1 rounded-pill border text-decoration-none text-dark"
+              title="Profil Admin"
+            >
+              <i className="fa-solid fa-shield-halved text-danger"></i>
+              <span className="small fw-semibold">{user?.fullName?.split(' ')[0] || 'Admin'}</span>
+            </Link>
           </div>
         </header>
 

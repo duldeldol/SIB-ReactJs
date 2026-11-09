@@ -20,11 +20,11 @@ function Footer() {
             </p>
             <div className="text-secondary small">
               <i className="fa-solid fa-location-dot text-primary me-2"></i>
-              STT Terpadu Nurul Fikri, Jakarta Selatan
+              Jakarta Selatan, Indonesia
             </div>
           </div>
 
-          {/* Kolom 2: Navigasi Cepat (React Router Links) */}
+          {/* Kolom 2: Navigasi Cepat */}
           <div className="col-lg-2 col-md-3 col-6">
             <h6 className="fw-bold text-white text-uppercase mb-3 small tracking-wider">
               Navigasi
@@ -65,7 +65,7 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Kolom 3: Kategori Populer (Tautan Interaktif ke /books) */}
+          {/* Kolom 3: Kategori Populer */}
           <div className="col-lg-3 col-md-3 col-6">
             <h6 className="fw-bold text-white text-uppercase mb-3 small tracking-wider">
               Kategori Populer
@@ -110,7 +110,7 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Kolom 4: Media Sosial & Creator */}
+          {/* Kolom 4: Media Sosial */}
           <div className="col-lg-3 col-md-6">
             <h6 className="fw-bold text-white text-uppercase mb-3 small tracking-wider">
               Terhubung Dengan Kami
@@ -156,10 +156,10 @@ function Footer() {
         {/* Divider & Copyright */}
         <div className="border-top border-secondary border-opacity-25 pt-4 mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
           <p className="text-secondary small mb-0">
-            © 2026 <strong>BookStore</strong> • Dikembangkan oleh <strong>Haydar Ali Ayyubi</strong>
+            &copy; 2026 <strong>BookStore</strong>. All rights reserved.
           </p>
           <p className="text-secondary small mb-0">
-            Studi Kasus React JS — STT Terpadu Nurul Fikri & NF Academy
+            Platform Penjualan Buku Online Terpercaya &bull; Indonesia
           </p>
         </div>
       </div>

@@ -599,13 +599,12 @@ function Register() {
                     {/* Footer Link Masuk */}
                     <div className="text-center mt-4 pt-3 border-top">
                       <span className="small text-muted">Sudah memiliki akun terdaftar? </span>
-                      <button
-                        type="button"
-                        className="btn btn-link p-0 small text-primary text-decoration-none fw-bold align-baseline"
-                        onClick={() => alert('Fitur Login saat ini sedang disiapkan pada modul berikutnya.')}
+                      <Link
+                        to="/login"
+                        className="small text-primary text-decoration-none fw-bold align-baseline"
                       >
                         Masuk ke Akun
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ) : (
@@ -637,21 +636,27 @@ function Register() {
                       </div>
                     </div>
 
-                    <div className="d-flex gap-2 justify-content-center">
+                    <div className="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                       <Link
-                        to="/books"
+                        to="/login"
                         className="btn text-white rounded-pill px-4 py-2 fw-semibold shadow-sm"
                         style={{
-                          background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 100%)',
+                          background: 'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)',
                           border: 'none',
                         }}
                       >
-                        <i className="fa-solid fa-book-open me-1"></i> Mulai Belanja Buku
+                        <i className="fa-solid fa-right-to-bracket me-2"></i> Masuk Sekarang
+                      </Link>
+                      <Link
+                        to="/books"
+                        className="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold"
+                      >
+                        <i className="fa-solid fa-book-open me-2"></i> Mulai Belanja
                       </Link>
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold"
+                        className="btn btn-link text-muted small text-decoration-none"
                       >
                         Daftar Akun Lain
                       </button>

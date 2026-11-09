@@ -143,14 +143,25 @@ const INITIAL_AUTHORS = [
   }
 ];
 
-// Data Awal Pengguna Terdaftar (Default Mock)
+// Data Awal Pengguna Terdaftar (Default Mock - Role Based Access Control)
 const INITIAL_USERS = [
   {
     id: 1,
+    fullName: 'Administrator BookStore',
+    email: 'admin@bookstore.com',
+    username: 'admin',
+    password: 'admin123',
+    role: 'admin',
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 2,
     fullName: 'Haydar Ali Ayyubi',
     email: 'haydar@example.com',
     username: 'haydarali',
-    createdAt: '2026-10-01T08:00:00.000Z'
+    password: 'user123',
+    role: 'user',
+    createdAt: '2026-10-02T08:00:00.000Z'
   }
 ];
 
@@ -175,6 +186,83 @@ const saveToStorage = (key, data) => {
     console.error('Gagal menyimpan ke LocalStorage:', err);
   }
 };
+
+// Helper Storage Khusus Pengguna: Menjamin akun default (admin & haydarali) selalu terdaftar dan tidak tertimpa cache lama
+export const loadUsersFromStorage = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.USERS);
+    let users = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(users)) users = [];
+
+    const adminAccount = {
+      id: 'admin_1',
+      fullName: 'Administrator BookStore',
+      email: 'admin@bookstore.com',
+      username: 'admin',
+      password: 'admin123',
+      role: 'admin',
+      createdAt: '2026-10-01T08:00:00.000Z',
+    };
+
+    const haydarAccount = {
+      id: 'user_2',
+      fullName: 'Haydar Ali Ayyubi',
+      email: 'haydar@example.com',
+      username: 'haydarali',
+      password: 'user123',
+      role: 'user',
+      createdAt: '2026-10-02T08:00:00.000Z',
+    };
+
+    // Pastikan admin selalu ada dengan kredensial valid
+    const adminIdx = users.findIndex(
+      (u) =>
+        (u.username || '').replace(/^@+/, '').toLowerCase() === 'admin' ||
+        (u.email || '').toLowerCase() === 'admin@bookstore.com'
+    );
+    if (adminIdx === -1) {
+      users.unshift(adminAccount);
+    } else {
+      users[adminIdx] = { ...users[adminIdx], ...adminAccount };
+    }
+
+    // Pastikan haydarali selalu ada dengan kredensial valid
+    const haydarIdx = users.findIndex(
+      (u) =>
+        (u.username || '').replace(/^@+/, '').toLowerCase() === 'haydarali' ||
+        (u.email || '').toLowerCase() === 'haydar@example.com'
+    );
+    if (haydarIdx === -1) {
+      users.push(haydarAccount);
+    } else {
+      users[haydarIdx] = { ...users[haydarIdx], ...haydarAccount };
+    }
+
+    // Bersihkan seluruh data pengguna agar selalu memiliki password dan role
+    users = users.map((u) => {
+      const cleanUsername = (u.username || '').replace(/^@+/, '').toLowerCase();
+      if (cleanUsername === 'admin') return adminAccount;
+      if (cleanUsername === 'haydarali') return haydarAccount;
+      return {
+        ...u,
+        username: (u.username || '').replace(/^@+/, ''),
+        role: u.role || 'user',
+        password: u.password || 'user123',
+      };
+    });
+
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    return users;
+  } catch (err) {
+    console.error('Gagal membaca data pengguna dari storage:', err);
+    return INITIAL_USERS;
+  }
+};
+
+// Inisialisasi awal saat bundle dimuat di browser
+if (typeof window !== 'undefined' && window.localStorage) {
+  loadUsersFromStorage();
+}
 
 /**
  * Inisialisasi Axios Client Instance
@@ -410,54 +498,125 @@ apiClient.defaults.adapter = async (config) => {
     }
   }
 
+  // --- RUTE AUTENTIKASI: LOGIN (POST /auth/login) ---
+  if (url.includes('/auth/login') && method === 'post') {
+    const payload = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+    // Bersihkan karakter @ di awal jika ada, dan trim
+    const rawIdentifier = (payload.identifier || payload.email || payload.username || '').trim();
+    const cleanIdentifier = rawIdentifier.replace(/^@+/, '').toLowerCase();
+    const password = (payload.password || '').trim();
+
+    const users = loadUsersFromStorage();
+    const matchedUser = users.find((u) => {
+      const uUsername = (u.username || '').replace(/^@+/, '').trim().toLowerCase();
+      const uEmail = (u.email || '').trim().toLowerCase();
+      const isIdentifierMatch = uUsername === cleanIdentifier || uEmail === cleanIdentifier;
+      const isPasswordMatch =
+        u.password === password || (!u.password && (password === 'user123' || password === 'admin123'));
+      return isIdentifierMatch && isPasswordMatch;
+    });
+
+    if (!matchedUser) {
+      const err = new Error('Email/username atau kata sandi tidak valid. Silakan periksa kembali.');
+      err.response = {
+        data: { message: 'Email/username atau kata sandi tidak valid. Silakan periksa kembali.' },
+        status: 401,
+        statusText: 'Unauthorized',
+        headers: {},
+        config,
+      };
+      throw err;
+    }
+
+    const safeUser = {
+      id: matchedUser.id,
+      fullName: matchedUser.fullName,
+      email: matchedUser.email,
+      username: (matchedUser.username || '').replace(/^@+/, ''),
+      role: matchedUser.role || 'user',
+      createdAt: matchedUser.createdAt,
+    };
+
+    return {
+      data: {
+        success: true,
+        message: 'Login berhasil!',
+        user: safeUser,
+        token: `mock-jwt-token-${matchedUser.id}-${Date.now()}`,
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  }
+
   // --- RUTE USERS & REGISTRASI (/auth/register atau /users) ---
   if (url.includes('/auth/register') || (url.includes('/users') && method === 'post')) {
     const payload = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
-    let users = loadFromStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
+    let users = loadUsersFromStorage();
 
     const emailTrimmed = (payload.email || '').trim().toLowerCase();
-    const usernameTrimmed = (payload.username || '').trim().toLowerCase();
+    const usernameTrimmed = (payload.username || '').replace(/^@+/, '').trim().toLowerCase();
 
     // Validasi keunikan email
-    const duplicateEmail = users.some((u) => u.email?.toLowerCase() === emailTrimmed);
+    const duplicateEmail = users.some((u) => (u.email || '').trim().toLowerCase() === emailTrimmed);
     if (duplicateEmail) {
-      return {
-        data: { message: 'Alamat email sudah terdaftar. Silakan gunakan email lain.' },
+      const err = new Error('Alamat email sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.');
+      err.response = {
+        data: { message: 'Alamat email sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.' },
         status: 409,
         statusText: 'Conflict',
         headers: {},
         config,
       };
+      throw err;
     }
 
     // Validasi keunikan username
-    const duplicateUsername = users.some((u) => u.username?.toLowerCase() === usernameTrimmed);
+    const duplicateUsername = users.some(
+      (u) => (u.username || '').replace(/^@+/, '').trim().toLowerCase() === usernameTrimmed
+    );
     if (duplicateUsername) {
-      return {
+      const err = new Error('Username sudah digunakan. Silakan pilih username lain.');
+      err.response = {
         data: { message: 'Username sudah digunakan. Silakan pilih username lain.' },
         status: 409,
         statusText: 'Conflict',
         headers: {},
         config,
       };
+      throw err;
     }
 
     const newUser = {
       id: Date.now(),
-      fullName: payload.fullName?.trim() || 'Pengguna Baru',
+      fullName: payload.fullName?.trim() || 'Pelanggan Baru',
       email: emailTrimmed,
       username: usernameTrimmed,
+      password: (payload.password || 'user123').trim(),
+      role: payload.role || 'user',
       createdAt: new Date().toISOString(),
     };
 
     users = [newUser, ...users];
     saveToStorage(STORAGE_KEYS.USERS, users);
 
+    const safeUser = {
+      id: newUser.id,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      username: newUser.username,
+      role: newUser.role,
+      createdAt: newUser.createdAt,
+    };
+
     return {
       data: {
         success: true,
         message: 'Pendaftaran akun berhasil!',
-        user: newUser,
+        user: safeUser,
+        token: `mock-jwt-token-${newUser.id}-${Date.now()}`,
       },
       status: 201,
       statusText: 'Created',
@@ -467,7 +626,7 @@ apiClient.defaults.adapter = async (config) => {
   }
 
   if (url.includes('/users') && method === 'get') {
-    const users = loadFromStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
+    const users = loadUsersFromStorage();
     return {
       data: users,
       status: 200,
@@ -535,19 +694,25 @@ export const deleteAuthor = async (id) => {
   return response.data;
 };
 
-// 9. Registrasi Pengguna Baru (Axios POST)
+// 9. Autentikasi / Login Pengguna (Axios POST)
+export const loginUser = async (credentials) => {
+  const response = await apiClient.post('/auth/login', credentials);
+  return response.data;
+};
+
+// 10. Registrasi Pengguna Baru (Axios POST)
 export const registerUser = async (userData) => {
   const response = await apiClient.post('/auth/register', userData);
   return response.data;
 };
 
-// 10. Ambil Daftar Pengguna Terdaftar (Axios GET)
+// 11. Ambil Daftar Pengguna Terdaftar (Axios GET)
 export const fetchUsers = async () => {
   const response = await apiClient.get('/users');
   return response.data;
 };
 
-// 11. Reset data ke default (Utilitas opsional)
+// 12. Reset data ke default (Utilitas opsional)
 export const resetAdminData = () => {
   saveToStorage(STORAGE_KEYS.GENRES, INITIAL_GENRES);
   saveToStorage(STORAGE_KEYS.AUTHORS, INITIAL_AUTHORS);
